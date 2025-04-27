@@ -10,13 +10,13 @@ from app.logger import logger
 
 
 class Base:
-    # _instances = {}
+    _instances = {}
 
-    # def __new__(cls, *args, **kwargs):
-    #     # Ensures singleton pattern
-    #     if cls not in cls._instances:
-    #         cls._instances[cls] = super(Base, cls).__new__(cls)
-    #     return cls._instances[cls]
+    def __new__(cls, *args, **kwargs):
+        # Ensures singleton pattern
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Base, cls).__new__(cls)
+        return cls._instances[cls]
 
     def __init__(self, *args, **kwargs):
         self.saved_model_path = None
