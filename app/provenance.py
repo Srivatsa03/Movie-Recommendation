@@ -8,6 +8,7 @@ from pathlib import Path
 PROVENANCE_LOG_DIR = Path(__file__).resolve().parent.parent / "provenance_logs"
 PROVENANCE_LOG_DIR.mkdir(exist_ok=True)  # Ensure the directory exists
 
+
 def get_git_commit_hash():
     """
     Retrieves the current Git commit hash to track the version of the pipeline/code.
@@ -20,16 +21,20 @@ def get_git_commit_hash():
     commit_hash = os.getenv("GIT_COMMIT_HASH")
     if commit_hash and commit_hash != "unknown":
         return commit_hash
-    
+
     # Fallback to local git repo (if running locally)
     try:
-        commit_hash = subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"],
-            stderr=subprocess.DEVNULL
-        ).decode("utf-8").strip()
+        commit_hash = (
+            subprocess.check_output(
+                ["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL
+            )
+            .decode("utf-8")
+            .strip()
+        )
         return commit_hash
     except Exception:
         return "unknown"
+
 
 def log_provenance(user_id, model_version, data_version, recommendations):
     """
@@ -43,11 +48,11 @@ def log_provenance(user_id, model_version, data_version, recommendations):
     """
     log_entry = {
         "timestamp": datetime.utcnow().isoformat(),  # When the recommendation was made (UTC)
-        "user_id": user_id,                          # For which user
-        "model_version": model_version,              # Which model (e.g., 'trained_model.pkl')
-        "data_version": data_version,                # Which data (e.g., 'final_processed_data.csv')
-        "pipeline_commit": get_git_commit_hash(),    # Which code version (Git commit hash)
-        "recommendations": recommendations           # The actual recommendations made
+        "user_id": user_id,  # For which user
+        "model_version": model_version,  # Which model (e.g., 'trained_model.pkl')
+        "data_version": data_version,  # Which data (e.g., 'final_processed_data.csv')
+        "pipeline_commit": get_git_commit_hash(),  # Which code version (Git commit hash)
+        "recommendations": recommendations,  # The actual recommendations made
     }
 
     # Save the log entry as a JSON line (newline-delimited JSON for easy parsing)
@@ -55,4 +60,6 @@ def log_provenance(user_id, model_version, data_version, recommendations):
     with open(log_file, "a") as f:
         f.write(json.dumps(log_entry) + "\n")
 
-    print(f"[Provenance] Logged for user {user_id} with commit {log_entry['pipeline_commit']}")
+    print(
+        f"[Provenance] Logged for user {user_id} with commit {log_entry['pipeline_commit']}"
+    )

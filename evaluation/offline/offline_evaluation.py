@@ -10,11 +10,15 @@ MODEL_VERSION = "v1.0"
 DATASET_VERSION = "final_processed_data.csv"
 PIPELINE_VERSION = "offline_eval_1.0"
 
+
 def load_final_model(model_filename="trained_model.pkl"):
-    logger.info(f"Loading model: {model_filename} | Model Version: {MODEL_VERSION}")  # Provenance log
+    logger.info(
+        f"Loading model: {model_filename} | Model Version: {MODEL_VERSION}"
+    )  # Provenance log
     with open(model_filename, "rb") as f:
         model = pickle.load(f)
     return model
+
 
 def compute_hit_rate(model, train_df, test_df, k=20, rating_threshold=4.0):
     # All unique items from both train and test (to simulate candidate items)
@@ -64,9 +68,12 @@ def compute_hit_rate(model, train_df, test_df, k=20, rating_threshold=4.0):
     hit_rate = hit_users / float(total_users) if total_users > 0 else 0.0
     return hit_rate
 
+
 def main():
     logger.info(f"Provenance | Starting offline evaluation:")
-    logger.info(f"Model Version: {MODEL_VERSION}, Dataset: {DATASET_VERSION}, Pipeline Version: {PIPELINE_VERSION}")
+    logger.info(
+        f"Model Version: {MODEL_VERSION}, Dataset: {DATASET_VERSION}, Pipeline Version: {PIPELINE_VERSION}"
+    )
 
     # Load the full dataset using your data.py
     df_all = load_data(f"data/{DATASET_VERSION}")
@@ -76,13 +83,19 @@ def main():
     sample_size = 2000
     if len(df_all) > sample_size:
         df_all = df_all.sample(n=sample_size, random_state=42)
-        logger.info(f"Sampled {sample_size} rows from the full dataset for offline evaluation.")  # Provenance log
+        logger.info(
+            f"Sampled {sample_size} rows from the full dataset for offline evaluation."
+        )  # Provenance log
     else:
-        logger.info("Dataset is smaller than or equal to 2000 rows; using the full dataset.")  # Provenance log
+        logger.info(
+            "Dataset is smaller than or equal to 2000 rows; using the full dataset."
+        )  # Provenance log
 
     # Split the sampled data into train and test sets (e.g., 80/20 split)
     train_df, test_df = train_test_split(df_all, test_size=0.2, random_state=42)
-    logger.info(f"Train set size: {len(train_df)} rows, Test set size: {len(test_df)} rows.")  # Provenance log
+    logger.info(
+        f"Train set size: {len(train_df)} rows, Test set size: {len(test_df)} rows."
+    )  # Provenance log
 
     # Load the final trained model (assumes the model was trained and saved as 'trained_model.pkl')
     svd_model = load_final_model("trained_models/trained_model.pkl")
@@ -94,8 +107,11 @@ def main():
         svd_model, train_df, test_df, k=k, rating_threshold=rating_threshold
     )
 
-    logger.info(f"Evaluation Metrics | Hit Rate@{k}: {hit_rate*100:.2f}%")  # Provenance log
+    logger.info(
+        f"Evaluation Metrics | Hit Rate@{k}: {hit_rate*100:.2f}%"
+    )  # Provenance log
     print(f"\nHit Rate@{k} : {hit_rate*100:.2f}%")
+
 
 if __name__ == "__main__":
     main()

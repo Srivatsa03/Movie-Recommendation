@@ -122,8 +122,10 @@ class MetricsComputer:
             "wtr": self.compute_wtr(),
             "avg_rating": self.compute_rating_quality(),
         }
-        
-        print(f"Provenance | Model Version: {MODEL_VERSION}, Pipeline: {PIPELINE_VERSION}, Telemetry Version: {TELEMETRY_VERSION}")
+
+        print(
+            f"Provenance | Model Version: {MODEL_VERSION}, Pipeline: {PIPELINE_VERSION}, Telemetry Version: {TELEMETRY_VERSION}"
+        )
 
         output_path = os.path.join(self.output_dir, "online_evaluation_report.json")
         with open(output_path, "w") as f:

@@ -10,7 +10,7 @@ from app.logger import logger
 
 
 class Base:
-    #_instances = {}
+    # _instances = {}
 
     # def __new__(cls, *args, **kwargs):
     #     # Ensures singleton pattern
@@ -43,12 +43,12 @@ class Base:
 
 
 class SVDRecommender(Base):
-    def __init__(self, model_path = None):
+    def __init__(self, model_path=None):
         super().__init__()
         root = (
             Path(__file__).resolve().parent.parent
         )  # Resolves to Movie-Recommendation/
-        if(model_path):
+        if model_path:
             self.saved_model_path = root / model_path
         else:
             self.saved_model_path = root / "trained_models" / "trained_model.pkl"
