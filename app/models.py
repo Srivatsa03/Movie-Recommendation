@@ -10,15 +10,15 @@ from app.logger import logger
 
 
 class Base:
-    _instances = {}
+    #_instances = {}
 
-    def __new__(cls):
-        # Ensures singleton pattern
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Base, cls).__new__(cls)
-        return cls._instances[cls]
+    # def __new__(cls, *args, **kwargs):
+    #     # Ensures singleton pattern
+    #     if cls not in cls._instances:
+    #         cls._instances[cls] = super(Base, cls).__new__(cls)
+    #     return cls._instances[cls]
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.saved_model_path = None
         self.dataset_path = None
         self.model = None
@@ -43,12 +43,15 @@ class Base:
 
 
 class SVDRecommender(Base):
-    def __init__(self):
+    def __init__(self, model_path = None):
         super().__init__()
         root = (
             Path(__file__).resolve().parent.parent
         )  # Resolves to Movie-Recommendation/
-        self.saved_model_path = root / "trained_models" / "trained_model.pkl"
+        if(model_path):
+            self.saved_model_path = root / model_path
+        else:
+            self.saved_model_path = root / "trained_models" / "trained_model.pkl"
         self.dataset_path = root / "data" / "final_processed_data.csv"
         self.model = self.load_model()
         self.df = self.load_data()
