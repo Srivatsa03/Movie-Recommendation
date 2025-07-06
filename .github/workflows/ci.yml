@@ -1,0 +1,42 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, macOS, ARM64]
+
+    steps:
+      - name: Get repo files
+        uses: actions/checkout@v4
+
+      - name: Setting up the virtualenv & installing dependencies
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+
+      - name: Check code formatting with Black
+        run: |
+          . .venv/bin/activate
+          python3 -m black --check .
+
+      - name: Run tests
+        run: |
+          . .venv/bin/activate
+          python3 -m pytest
+
+      - name: Build and deploy with Docker Compose
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          echo "Building Docker image with commit $COMMIT_HASH..."
+          docker compose build --build-arg GIT_COMMIT=$COMMIT_HASH
+          echo "Spinning up container..."
+          docker compose down --remove-orphans
+          docker compose up -d
+          echo "Successfully deployed!"
